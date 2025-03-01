@@ -1,5 +1,7 @@
 :root {
-    --accent: #32cd32;
+    /* --accent: #32cd32; */
+    /* --accent: AntiqueWhite; */
+    --accent: white;
     --bg: #000;
     --white: #fff;
 }
@@ -26,6 +28,7 @@ body {
     color: var(--accent);
     font-family: "Share Tech Mono", "Monaco", "Courier New", monospace, sans-serif;
     /* text-shadow: 0 0 10px var(--accent); */
+    font-size: 1.6rem;
 }
 
 input,
