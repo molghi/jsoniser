@@ -116,3 +116,33 @@ input::placeholder {
 code {
     font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
 }
+
+/*  ============================================================================================= */
+
+/* Apply to any scrollable element */
+body,
+textarea,
+div {
+    scrollbar-width: thin; /* Options: auto, thin, none */
+    scrollbar-color: darkgrey black; /* thumb colour first, track colour second */
+}
+
+/* For WebKit-based browsers (Chrome, Edge, Safari) */
+body::-webkit-scrollbar,
+textarea::-webkit-scrollbar,
+div::-webkit-scrollbar {
+    width: 5px; /* Width of the scrollbar */
+}
+
+body::-webkit-scrollbar-thumb,
+textarea::-webkit-scrollbar-thumb,
+div::-webkit-scrollbar-thumb {
+    background: darkgrey; /* Thumb (draggable part) colour */
+    border-radius: 0px; /* Rounded corners */
+}
+
+body::-webkit-scrollbar-track,
+textarea::-webkit-scrollbar-track,
+div::-webkit-scrollbar-track {
+    background: black; /* Track colour */
+}

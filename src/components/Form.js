@@ -1,32 +1,64 @@
+import { useReducer } from "react";
+import ReactDOM from "react-dom/client";
+import { createPortal } from "react-dom";
+
 import "./Form.css";
+import FormInput from "./FormInput";
+import FormTextarea from "./FormTextarea";
+import FormButtons from "./FormButtons";
+import stateReducer from "./stateReducer";
+import Modal from "./Modal";
+import { exportNotesJson, makeObject } from "./export";
+
+// ================================================================================================
+
+const initialState = {
+    inputLabelMovedUp: false,
+    inputTextareaMovedUp: false,
+    textInputValue: "",
+    textareaValue: "",
+    modalShown: false,
+    jsonised: "",
+};
 
 function Form() {
+    const [state, dispatch] = useReducer(stateReducer, initialState);
+    let object;
+    console.log(state);
+
+    // if you type in input fields, label stays at the top -- input empty, label is inside of it -- and also upd the current input/textarea value
+    const handleTyping = (e) => {
+        dispatch({
+            type: "move-labels",
+            payload: e.target.value,
+        });
+    };
+
+    // form submit is export
+    const handleFormSubmit = (e) => {
+        e.preventDefault();
+        exportNotesJson(state.textInputValue, state.textareaValue);
+    };
+
+    // preview is show modal window
+    const onPreviewClick = () => {
+        object = makeObject(state.textInputValue, state.textareaValue);
+        dispatch({
+            type: "toggle-modal",
+            payload: object,
+        });
+        if (document.querySelector(".modal")) document.querySelector(".modal").remove();
+        document.querySelector("body").insertAdjacentHTML("afterbegin", `<div class="modal"></div>`); // for React portals
+    };
+
     return (
         <div className="form">
-            <form className="form__itself">
-                <div className="form__input-box">
-                    <input className="form__input" id="input-text" type="text" />
-                    <label className="form__label" htmlFor="input-text">
-                        Enter key names, separated by pipes (<code>|</code>). Example: <code>name | sex | age | city</code>
-                    </label>
-                </div>
-                <div className="form__input-box">
-                    <textarea className="form__input form__textarea" id="input-textarea" name="textarea"></textarea>
-                    <label className="form__label" htmlFor="input-textarea">
-                        Enter values, one per line. No empty lines. Separate categories within a line using <code>|</code>.
-                        <span>
-                            &nbsp;Example: <code>Mary | female | 25 | Brighton</code>
-                        </span>
-                    </label>
-                </div>
-                <div className="form__buttons-box">
-                    <button className="form__button form__button--preview" type="button">
-                        Preview
-                    </button>
-                    <button className="form__button form__button--export" type="button">
-                        Export
-                    </button>
-                </div>
+            <form onSubmit={handleFormSubmit} className="form__itself">
+                <FormInput onChange={handleTyping} labelMovedUp={state.inputLabelMovedUp} />
+                <FormTextarea onChange={handleTyping} labelMovedUp={state.inputTextareaMovedUp} />
+                <FormButtons onPreviewClick={onPreviewClick} />
+
+                {state.modalShown && createPortal(<Modal data={state.jsonised} />, document.querySelector(".modal"))}
             </form>
         </div>
     );
