@@ -1,5 +1,9 @@
+import { v4 as uuidv4 } from "uuid";
+
 function exportNotesJson(dataKeys, dataValues) {
     const data = makeObject(dataKeys, dataValues);
+    // if (typeof data === "string") return data;
+    if (typeof data !== "object") return data;
 
     const now = new Date();
     const nowDate = now.getDate();
@@ -32,17 +36,36 @@ function exportNotesJson(dataKeys, dataValues) {
 // ================================================================================================
 
 function makeObject(dataKeys, dataValues) {
-    const objectStrings = dataValues.split("\n");
-    const objects = objectStrings.map((string, index) => {
-        const splittedString = string.split("|").map((x) => x.trim());
-        const splittedKeys = dataKeys.split("|").map((x) => x.trim());
-        const obj = {};
-        splittedKeys.forEach((key, i) => {
-            obj[key.trim()] = splittedString[i].trim();
+    const stringKeys = dataKeys.split("|").map((x) => x.trim());
+    const stringValues = dataValues.split("\n").map((x) => x.trim());
+    const stringValuesArr = stringValues.map((x) => x.split("|").map((x) => x.trim()));
+    const allSameLength = [stringKeys, ...stringValuesArr].every((x, i, a) => x.length === a[0].length);
+
+    if (allSameLength) {
+        const objects = stringValues.map((string, index) => {
+            const splittedString = string.split("|").map((x) => x.trim());
+            const obj = {};
+            stringKeys.forEach((key, i) => {
+                obj[key.trim()] = splittedString[i].trim();
+            });
+            obj.id = uuidv4();
+            return obj;
         });
-        return obj;
-    });
-    return objects;
+        return objects;
+    } else {
+        const problemStrings = stringValuesArr
+            .map((x, i) => {
+                if (x.length !== stringKeys.length) return i + 1;
+                else return -1;
+            })
+            .filter((x) => x !== -1)
+            .join(", ")
+            .trim();
+        return `Error: The length of these value strings does not match the length of the key string: ${problemStrings}. As in your key string, each value string must have ${
+            stringKeys.length
+        } parts
+                separated by ${stringKeys.length - 1} pipe characters.`;
+    }
 }
 
 // ================================================================================================

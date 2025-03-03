@@ -1,5 +1,4 @@
 import { useReducer } from "react";
-import ReactDOM from "react-dom/client";
 import { createPortal } from "react-dom";
 
 import "./Form.css";
@@ -19,12 +18,15 @@ const initialState = {
     textareaValue: "",
     modalShown: false,
     jsonised: "",
+    error: "",
+    isTyping: false,
 };
 
 function Form() {
     const [state, dispatch] = useReducer(stateReducer, initialState);
-    let object;
     console.log(state);
+
+    // ================================================================================================
 
     // if you type in input fields, label stays at the top -- input empty, label is inside of it -- and also upd the current input/textarea value
     const handleTyping = (e) => {
@@ -37,28 +39,54 @@ function Form() {
     // form submit is export
     const handleFormSubmit = (e) => {
         e.preventDefault();
-        exportNotesJson(state.textInputValue, state.textareaValue);
+        const object = exportNotesJson(state.textInputValue, state.textareaValue);
+        if (typeof object === "string") {
+            dispatch({
+                type: "toggle-modal",
+                payload: object,
+            });
+        }
     };
 
     // preview is show modal window
     const onPreviewClick = () => {
-        object = makeObject(state.textInputValue, state.textareaValue);
+        const object = makeObject(state.textInputValue, state.textareaValue);
         dispatch({
             type: "toggle-modal",
             payload: object,
         });
-        if (document.querySelector(".modal")) document.querySelector(".modal").remove();
-        document.querySelector("body").insertAdjacentHTML("afterbegin", `<div class="modal"></div>`); // for React portals
+        if (typeof object !== "string") {
+            if (document.querySelector(".modal")) document.querySelector(".modal").remove();
+            document.querySelector("body").insertAdjacentHTML("afterbegin", `<div class="modal"></div>`); // for React portals
+        }
     };
+
+    // are both inputs filled?
+    const inputsAreFilled = [state.textInputValue, state.textareaValue].every((item) => item.length > 0);
+
+    // hide modal
+    const hideModal = () => {
+        dispatch({
+            type: "hide-modal",
+        });
+    };
+
+    // ================================================================================================
 
     return (
         <div className="form">
             <form onSubmit={handleFormSubmit} className="form__itself">
                 <FormInput onChange={handleTyping} labelMovedUp={state.inputLabelMovedUp} />
                 <FormTextarea onChange={handleTyping} labelMovedUp={state.inputTextareaMovedUp} />
-                <FormButtons onPreviewClick={onPreviewClick} />
+                <FormButtons
+                    onPreviewClick={onPreviewClick}
+                    inputsAreFilled={inputsAreFilled}
+                    error={state.error}
+                    isTyping={state.isTyping}
+                />
 
-                {state.modalShown && createPortal(<Modal data={state.jsonised} />, document.querySelector(".modal"))}
+                {state.modalShown &&
+                    createPortal(<Modal data={state.jsonised} onClick={hideModal} />, document.querySelector(".modal"))}
             </form>
         </div>
     );
