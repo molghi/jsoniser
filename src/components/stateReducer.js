@@ -11,6 +11,7 @@ function stateReducer(state, action) {
                     [activeElNameLabel]: true, // a piece of state responsible for 'is the label moved up or not?'
                     [activeElName]: action.payload, // a piece of state responsible for holding the current value of input/textarea
                     isTyping: true,
+                    eventHappened: "",
                 };
             } else {
                 return {
@@ -18,6 +19,7 @@ function stateReducer(state, action) {
                     [activeElNameLabel]: false, // a piece of state responsible for 'is the label moved up or not?'
                     [activeElName]: action.payload, // a piece of state responsible for holding the current value of input/textarea
                     isTyping: true,
+                    eventHappened: "",
                 };
             }
             return state;
@@ -38,6 +40,24 @@ function stateReducer(state, action) {
                     isTyping: false,
                 };
             }
+
+        case "notification":
+            return {
+                ...state,
+                notification: action.payload,
+            };
+
+        case "reset":
+            return {
+                ...state,
+                textInputValue: "",
+                textareaValue: "",
+                inputLabelMovedUp: false,
+                inputTextareaMovedUp: false,
+                eventHappened: action.payload,
+                error: "",
+                notification: "",
+            };
 
         case "hide-modal":
             return {

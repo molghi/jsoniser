@@ -1,7 +1,8 @@
 import { useState } from "react";
 
-function FormInput({ onChange, labelMovedUp }) {
+function FormInput({ onChange, labelMovedUp, eventHappened }) {
     const [input, setInput] = useState("");
+    if (eventHappened?.type === "click" && eventHappened?.target.textContent === "Reset" && input.length > 0) setInput("");
 
     const handleChange = (e) => {
         setInput(e.target.value);

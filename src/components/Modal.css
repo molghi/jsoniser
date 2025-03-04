@@ -45,7 +45,7 @@
     overflow-y: auto;
     position: fixed;
     z-index: 1000;
-    padding: 30px;
+    padding: 3rem;
     animation: show 0.3s ease-in-out;
 }
 
@@ -99,4 +99,47 @@
 .modal-json {
     margin-top: 20px;
     font-size: 1.4rem;
+}
+
+code,
+pre {
+    white-space: pre-wrap;
+}
+
+@media (max-width: 993px) {
+    .modal-content {
+        width: 740px;
+    }
+}
+
+@media (max-width: 768px) {
+    .modal-content {
+        width: 500px;
+        padding: 2rem;
+    }
+    .modal-json {
+        font-size: 1.2rem;
+        margin-top: 10px;
+    }
+    .modal-title {
+        font-size: 24px;
+    }
+}
+
+@media (max-width: 530px) {
+    .modal-content {
+        width: 95%;
+        padding: 1rem;
+    }
+    .modal-close {
+        top: 5px;
+        right: 5px;
+    }
+    .modal-title {
+        font-size: 20px;
+    }
+    .modal-json {
+        font-size: 1rem;
+        margin-top: 7px;
+    }
 }
