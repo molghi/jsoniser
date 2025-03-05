@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 
 function FormButtons({ onPreviewClick, inputsAreFilled, error, isTyping, notification, state, onResetClick }) {
-    const [animation, setAnimation] = useState(false); // message is slightly animated
+    const [, setAnimation] = useState(false); // message is slightly animated
     const mySpan = useRef(); // error msg span
 
     const classes = !inputsAreFilled ? "form__button disabled" : "form__button";
@@ -18,7 +18,7 @@ function FormButtons({ onPreviewClick, inputsAreFilled, error, isTyping, notific
             void mySpan.current.offsetWidth; // trigger reflow of the element, which effectively resets any ongoing CSS animations or transitions
             mySpan.current.classList.add("zoom-in");
         }
-    });
+    }, [isTyping, error]);
 
     return (
         <div

@@ -29,7 +29,7 @@ function Provider({ children }) {
     // ================================================================================================
 
     useEffect(() => {
-        const [object, duplicates] = makeObject(state.textInputValue, state.textareaValue); // looking if there are any duplicate entries in textarea
+        const [, duplicates] = makeObject(state.textInputValue, state.textareaValue); // looking if there are any duplicate entries in textarea
         if (Array.isArray(duplicates) && duplicates.length > 0) {
             dispatch({
                 type: "notification",
@@ -49,7 +49,7 @@ function Provider({ children }) {
         window.addEventListener("resize", lineNums); // listening to the resize event
 
         return () => window.removeEventListener("resize", lineNums); // clean up
-    }, [state.textareaValue]);
+    }, [state.textareaValue, state.textInputValue]);
 
     // ================================================================================================
 
@@ -81,7 +81,7 @@ function Provider({ children }) {
 
     // Preview btn is show modal window
     const onPreviewClick = () => {
-        const [object, duplicates] = makeObject(state.textInputValue, state.textareaValue);
+        const [object] = makeObject(state.textInputValue, state.textareaValue);
         dispatch({
             type: "btn-clicked",
             payload: object, // payload is either json to be exported or the error string/message (if input was incorrect)
@@ -122,7 +122,7 @@ function Provider({ children }) {
                 myTextarea.current.style.height = Math.floor(window.innerHeight * 0.55) + "px";
             }
             // checking duplicates:
-            const [object, duplicates] = makeObject(state.textInputValue, state.textareaValue);
+            const [, duplicates] = makeObject(state.textInputValue, state.textareaValue);
             if (Array.isArray(duplicates) && duplicates.length > 0) {
                 dispatch({
                     type: "notification",

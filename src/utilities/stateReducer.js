@@ -103,8 +103,6 @@ function stateReducer(state, action) {
         default:
             return console.error(`Unknown action type`);
     }
-
-    return state;
 }
 
 export default stateReducer;

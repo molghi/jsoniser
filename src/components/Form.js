@@ -13,7 +13,6 @@ import MyContext from "../context/MyContext";
 function Form() {
     const {
         state,
-        dispatch,
         handleTyping,
         handleFormSubmit,
         onPreviewClick,

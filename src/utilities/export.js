@@ -1,7 +1,7 @@
 import makeObject from "./makeObject";
 
 function exportNotesJson(dataKeys, dataValues) {
-    const [data, duplicates] = makeObject(dataKeys, dataValues);
+    const [data] = makeObject(dataKeys, dataValues);
     if (typeof data !== "object") return data;
 
     const now = new Date();
