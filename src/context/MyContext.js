@@ -1,7 +1,8 @@
-import { createContext, useReducer, useRef } from "react";
-import { exportNotesJson, makeObject } from "../components/export";
-import stateReducer from "../components/stateReducer";
-import getLineNumbers from "../components/getLineNumbers";
+import { createContext, useReducer, useRef, useEffect } from "react";
+import { exportNotesJson } from "../utilities/export";
+import makeObject from "../utilities/makeObject";
+import stateReducer from "../utilities/stateReducer";
+import getLineNumbers from "../utilities/getLineNumbers";
 
 // ================================================================================================
 
@@ -18,6 +19,7 @@ const initialState = {
     isTyping: false,
     notification: "",
     eventHappened: null,
+    textareaLineNumbers: [],
 };
 
 function Provider({ children }) {
@@ -26,43 +28,63 @@ function Provider({ children }) {
 
     // ================================================================================================
 
-    // if you type in input fields, label stays at the top -- input empty, label is inside of it -- and also upd the current input/textarea value
-    const handleTyping = (e) => {
-        dispatch({
-            type: "move-labels",
-            payload: e.target.value,
-        });
-        const [object, duplicates] = makeObject(state.textInputValue, state.textareaValue);
+    useEffect(() => {
+        const [object, duplicates] = makeObject(state.textInputValue, state.textareaValue); // looking if there are any duplicate entries in textarea
         if (Array.isArray(duplicates) && duplicates.length > 0) {
             dispatch({
                 type: "notification",
                 payload: `Note: Duplicate entries on these lines: ${duplicates.join(", ").trim()}.`,
             });
         }
+
+        const lineNums = () => {
+            const lineNumbersArr = getLineNumbers(state.textareaValue); // calculating the height of each logical line in textarea
+            dispatch({
+                type: "textarea-line-numbers",
+                payload: lineNumbersArr,
+            });
+        };
+        lineNums();
+
+        window.addEventListener("resize", lineNums); // listening to the resize event
+
+        return () => window.removeEventListener("resize", lineNums); // clean up
+    }, [state.textareaValue]);
+
+    // ================================================================================================
+
+    // if you type in input fields/if they aren't empty, labels stay above them -- input empty-labels are inside of them
+    // also upd the current input/textarea value
+    const handleTyping = (e) => {
+        dispatch({
+            type: "typing-event",
+            payload: e.target.value,
+        });
     };
 
     // ================================================================================================
 
-    // form submit is export
+    // form submit is when clicking Export btn
     const handleFormSubmit = (e) => {
         e.preventDefault();
         const object = exportNotesJson(state.textInputValue, state.textareaValue);
         if (typeof object === "string") {
+            // if there was an error...
             dispatch({
-                type: "toggle-modal",
-                payload: object,
+                type: "btn-clicked",
+                payload: object, // payload===error string
             });
         }
     };
 
     // ================================================================================================
 
-    // preview is show modal window
+    // Preview btn is show modal window
     const onPreviewClick = () => {
         const [object, duplicates] = makeObject(state.textInputValue, state.textareaValue);
         dispatch({
-            type: "toggle-modal",
-            payload: object,
+            type: "btn-clicked",
+            payload: object, // payload is either json to be exported or the error string/message (if input was incorrect)
         });
         if (typeof object !== "string") {
             if (document.querySelector(".modal")) document.querySelector(".modal").remove();
@@ -72,7 +94,7 @@ function Provider({ children }) {
 
     // ================================================================================================
 
-    // are both inputs filled?
+    // are both inputs filled/not empty?
     const inputsAreFilled = [state.textInputValue, state.textareaValue].every((item) => item.length > 0);
 
     // ================================================================================================
@@ -88,10 +110,8 @@ function Provider({ children }) {
 
     // handling the paste event
     const handlePaste = (e) => {
-        const result = getLineNumbers(state.textareaValue);
-        const pastedData = e.clipboardData.getData("text");
-        console.log(pastedData);
         setTimeout(() => {
+            // changing textarea height (if needed):
             const textareaMinimalHeight = Math.floor(window.innerHeight * 0.4);
             myTextarea.current.style.height = "auto";
             myTextarea.current.style.height = myTextarea.current.scrollHeight + "px";
@@ -101,8 +121,7 @@ function Provider({ children }) {
             } else if (textareaAfterReset < textareaMinimalHeight) {
                 myTextarea.current.style.height = Math.floor(window.innerHeight * 0.55) + "px";
             }
-
-            console.log(state.textareaValue);
+            // checking duplicates:
             const [object, duplicates] = makeObject(state.textInputValue, state.textareaValue);
             if (Array.isArray(duplicates) && duplicates.length > 0) {
                 dispatch({
@@ -110,14 +129,14 @@ function Provider({ children }) {
                     payload: `Note: Duplicate entries on these lines: ${duplicates.join(", ").trim()}.`,
                 });
             }
-        }, 10);
+        }, 10); // setTimeout is needed because the paste event takes some little time
     };
 
     // ================================================================================================
 
     // handling reset btn click
     const onResetClick = (e) => {
-        myTextarea.current.style.height = Math.floor(window.innerHeight * 0.55) + "px";
+        myTextarea.current.style.height = Math.floor(window.innerHeight * 0.55) + "px"; // resetting textarea height
         dispatch({ type: "reset", payload: e });
     };
 
@@ -145,3 +164,5 @@ function Provider({ children }) {
 
 export default MyContext;
 export { Provider };
+
+// const pastedData = e.clipboardData.getData("text");

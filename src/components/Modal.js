@@ -1,8 +1,6 @@
 import "./Modal.css";
 import { ReactComponent as CloseIcon } from "../img/xmark-solid.svg";
 
-// console.log(closeIcon);
-
 function Modal({ data, onClick }) {
     return (
         <div className="modal-inner">

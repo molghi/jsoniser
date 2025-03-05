@@ -1,19 +1,17 @@
 import { useEffect, useRef, useState } from "react";
 
 function FormButtons({ onPreviewClick, inputsAreFilled, error, isTyping, notification, state, onResetClick }) {
-    console.log(notification);
-    console.log(state);
-    const [animation, setAnimation] = useState(false);
-    const mySpan = useRef();
+    const [animation, setAnimation] = useState(false); // message is slightly animated
+    const mySpan = useRef(); // error msg span
+
     const classes = !inputsAreFilled ? "form__button disabled" : "form__button";
     const resetClasses = [state.textInputValue, state.textareaValue].some((x) => x.length > 0)
         ? "form__button"
-        : "form__button disabled";
+        : "form__button disabled"; // special case: reset btn style
 
     useEffect(() => {
+        if (!mySpan.current || isTyping === true) return;
         setAnimation(false);
-        if (!mySpan.current) return;
-        if (isTyping === true) return;
         if (error) {
             setAnimation(true);
             mySpan.current.classList.remove("zoom-in");
@@ -25,7 +23,7 @@ function FormButtons({ onPreviewClick, inputsAreFilled, error, isTyping, notific
     return (
         <div
             className="form__buttons-box"
-            title={`${inputsAreFilled ? "" : "To enable Preview/Export buttons, both inputs must be filled."}`}
+            title={`${!inputsAreFilled && "To enable Preview/Export buttons, both inputs must be filled."}`}
         >
             <button className={classes} type="button" onClick={onPreviewClick}>
                 Preview

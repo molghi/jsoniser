@@ -1,4 +1,4 @@
-import { useRef, useContext } from "react";
+import { useContext } from "react";
 import { createPortal } from "react-dom";
 
 import "./Form.css";
@@ -24,7 +24,7 @@ function Form() {
         myTextarea,
     } = useContext(MyContext);
 
-    console.log(state);
+    // console.log(state);
 
     return (
         <div className="form">

@@ -2,10 +2,11 @@ import { useState } from "react";
 
 function FormInput({ onChange, labelMovedUp, eventHappened }) {
     const [input, setInput] = useState("");
-    if (eventHappened?.type === "click" && eventHappened?.target.textContent === "Reset" && input.length > 0) setInput("");
+
+    if (eventHappened?.type === "click" && eventHappened?.target.textContent === "Reset" && input.length > 0) setInput(""); // resetting input if Reset btn was clicked and input was not empty
 
     const handleChange = (e) => {
-        setInput(e.target.value);
+        setInput(e.target.value); //    handling input change
         onChange(e);
     };
 
